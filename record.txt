@@ -1,0 +1,55 @@
+心得: eval.py: 給兩張圖, output jbf
+      實作: Gs先算, 使用迴圈跳進去算Gr, 兩個卷積後直接與原圖區塊作卷積並得到該值
+      問題: 如果上述方法是對的, 該如何對此兩kernel做卷積
+實作: 
+1./255 圖 (可能要做歸一化!!)
+2.歸一化kernel_s
+3.計算kernel_r
+4.計算kernel_r*kernel_s並歸一化
+
+
+
+
+1.使用 cv2.BORDER_REFLECT (opencv)or symmetric (numpy)來當作padding
+2.計算kernel時, 使用float64
+3.可以考慮用一下scipy
+4.周圍6個點是最小值就是local minimum
+5.F得分母是filter的合, 是normalize
+6.算range keral固定就那幾種, 可以先建好, 在查表(filter在擾的時候, 只要計算出pixel的差值, 再去look up)
+
+計算spatial kernel應該按照公式沒有問題
+計算range kernel的時候,pixel value的difference是把原本0~255的uint8, 變成0~1的float64 (直接”/“就是了)再套入公式計算
+最後計算最終kernel (相乘normalize)
+對原圖做filter,最後得到的圖的value會是介於0~255的float64,最後把圖片變成uint8 (如同eval.py裡面的” astype(’np.uint8’) “
+
+
+
+???
+
+助教好：
+在算66張圖的cost時，需要先把所有jbf圖的數值變成整數後再相減bf，還是可以直接小數相減，還是說都可以，只要有在report註記即可呢？
+ans:
+最正確的應該是 都變成正確的pixel值之後再算cost.
+
+???
+
+助教您好
+請問轉灰階時，我比較了COLOR_RGB2GRAY的結果
+發現自己算的轉回uint8(包含四捨五入)時
+這兩者會有些許誤差
+這是被容許的嗎？
+ans:
+你是指report上需要放的灰階圖片嗎? 如果不是eval.py需要測試的範圍,一點點誤差是可以的
+
+???
+
+助教好，請問你們測試時會改變 border_type 嗎？不然因為我是用 numpy 實作，我想把 padding 寫死成 symmetric（我看 eval 是寫死成 reflect）
+ans:
+我們跑eval不會改變border type 只會換sigma 跟圖片
+
+
+???
+
+助教好，請問 cost 這邊的 norm 是所有 entries 平方相加開根號嗎
+ans:
+沒有平方 就像eval.py 裡面一樣
